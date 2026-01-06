@@ -7,11 +7,41 @@ import { Input } from "@/components/ui/input";
 export default function Home() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    setError("");
+
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
       setSubmitted(true);
+      setEmail("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to subscribe");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,18 +107,34 @@ export default function Home() {
                 <Text variant="label" size="sm" align="center" tone="muted">
                   Get notified when we launch
                 </Text>
-                <div className="flex gap-2">
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="flex-1"
-                  />
-                  <OmbButton type="submit" variant="primary">
-                    Notify Me
-                  </OmbButton>
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setError("");
+                      }}
+                      required
+                      className="flex-1"
+                      disabled={loading}
+                    />
+                    <OmbButton type="submit" variant="primary" disabled={loading}>
+                      {loading ? "..." : "Notify Me"}
+                    </OmbButton>
+                  </div>
+                  {error && (
+                    <Text
+                      variant="caption"
+                      size="sm"
+                      align="center"
+                      className="text-[color:var(--color-omb-red)]"
+                    >
+                      {error}
+                    </Text>
+                  )}
                 </div>
               </form>
             ) : (
