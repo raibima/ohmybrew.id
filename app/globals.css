@@ -6,8 +6,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-nunito);
+  --font-mono: var(--font-nunito);
+  --font-display: var(--font-pacifico);
+  --font-body: var(--font-nunito);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -37,6 +39,17 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  /* Oh My Brew brand tokens */
+  --color-omb-red: #ac0000;
+  --color-omb-light-mist: #f2f0f6;
+  --color-omb-soft-ink: #333333;
+  --color-omb-night-black: #000000;
+  --color-omb-electric-brew-blue: #1d0fcb;
+  --color-omb-warm-grey: #b5b0c5;
+  --color-omb-off-white: #faf9fd;
+  --color-status-success: #2e7d32;
+  --color-status-warning: #f9a825;
+  --color-status-error: #ac0000;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -47,72 +60,76 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Radius: 10–12 px for soft, friendly cards/buttons */
+  --radius: 0.75rem;
+  /* Core brand colors mapped to design.md */
+  --background: #f2f0f6; /* Light Mist */
+  --foreground: #333333; /* Soft Ink */
+  --card: #faf9fd; /* Off-White */
+  --card-foreground: #333333;
+  --popover: #ffffff;
+  --popover-foreground: #333333;
+  --primary: #ac0000; /* Oh My Brew Red */
+  --primary-foreground: #ffffff;
+  --secondary: #faf9fd; /* Off-White */
+  --secondary-foreground: #ac0000;
+  --muted: #faf9fd;
+  --muted-foreground: #b5b0c5; /* Warm Grey */
+  --accent: #1d0fcb; /* Electric Brew Blue */
+  --accent-foreground: #ffffff;
+  --destructive: #ac0000;
+  --border: #b5b0c5; /* Warm Grey */
+  --input: #faf9fd;
+  --ring: #1d0fcb; /* Focus ring in blue, per forms spec */
+  /* Charts / decorative usage: keep within brand palette */
+  --chart-1: #ac0000;
+  --chart-2: #1d0fcb;
+  --chart-3: #333333;
+  --chart-4: #b5b0c5;
+  --chart-5: #faf9fd;
+  /* Sidebar (if used) */
+  --sidebar: #f2f0f6;
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #ac0000;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #faf9fd;
+  --sidebar-accent-foreground: #ac0000;
+  --sidebar-border: #b5b0c5;
+  --sidebar-ring: #1d0fcb;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #000000; /* Night Black */
+  --foreground: #faf9fd;
+  --card: #333333;
+  --card-foreground: #faf9fd;
+  --popover: #333333;
+  --popover-foreground: #faf9fd;
+  --primary: #ac0000;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #faf9fd;
+  --muted: #1a1a1a;
+  --muted-foreground: #b5b0c5;
+  --accent: #1d0fcb;
+  --accent-foreground: #ffffff;
+  --destructive: #ac0000;
+  --border: rgba(250, 249, 253, 0.14);
+  --input: rgba(250, 249, 253, 0.12);
+  --ring: #1d0fcb;
+  --chart-1: #ac0000;
+  --chart-2: #1d0fcb;
+  --chart-3: #faf9fd;
+  --chart-4: #b5b0c5;
+  --chart-5: #333333;
+  --sidebar: #111111;
+  --sidebar-foreground: #faf9fd;
+  --sidebar-primary: #ac0000;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1a1a;
+  --sidebar-accent-foreground: #faf9fd;
+  --sidebar-border: rgba(250, 249, 253, 0.14);
+  --sidebar-ring: #1d0fcb;
 }
 
 @layer base {
@@ -121,5 +138,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
   }
 }
