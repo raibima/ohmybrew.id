@@ -14,9 +14,9 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Oh My Brew – Coming Soon",
+  title: "Oh My Brew",
   description:
-    "Good quality specialty coffee at affordable prices. Coming soon to BSD, Tangerang.",
+    "Good quality specialty coffee at affordable prices. Located in BSD, Tangerang.",
 };
 
 export default function RootLayout({
