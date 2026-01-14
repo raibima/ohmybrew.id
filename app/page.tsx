@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Text, StatusPill, OmbButton } from "@/components/ui/ds";
 import { Input } from "@/components/ui/input";
 
@@ -56,8 +57,8 @@ export default function Home() {
       <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
         {/* Content container with entrance animation */}
         <div className="flex max-w-lg flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {/* Coming Soon pill */}
-          <StatusPill className="mb-8">Coming Soon</StatusPill>
+          {/* Now Open pill */}
+          <StatusPill className="mb-8">Now Open</StatusPill>
 
           {/* Brand name */}
           <h1 className="mb-6 font-display text-6xl leading-tight text-[color:var(--color-omb-red)] sm:text-7xl">
@@ -76,7 +77,7 @@ export default function Home() {
           </Text>
 
           {/* Location */}
-          <div className="mb-12 flex items-center gap-2 text-[color:var(--color-omb-warm-grey)]">
+          <div className="mb-8 flex items-center gap-2 text-[color:var(--color-omb-warm-grey)]">
             <svg
               className="h-4 w-4"
               fill="none"
@@ -100,12 +101,19 @@ export default function Home() {
             </Text>
           </div>
 
+          {/* Order CTA */}
+          <Link href="/order" className="mb-12">
+            <OmbButton variant="primary" size="lg">
+              Order Now
+            </OmbButton>
+          </Link>
+
           {/* Email signup */}
           <div className="w-full max-w-sm">
             {!submitted ? (
               <form onSubmit={handleSubmit} className="flex flex-col gap-3">
                 <Text variant="label" size="sm" align="center" tone="muted">
-                  Get notified when we launch
+                  Be the first to know about promos
                 </Text>
                 <div className="flex flex-col gap-2">
                   <div className="flex gap-2">
@@ -157,8 +165,7 @@ export default function Home() {
                   </div>
                 </div>
                 <Text variant="body" size="md" align="center" tone="default">
-                  Awesome! We&apos;ll let you know when we&apos;re ready to
-                  brew.
+                  You&apos;re in! We&apos;ll keep you posted.
                 </Text>
               </div>
             )}
