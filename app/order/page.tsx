@@ -2,6 +2,9 @@ import { Text, LinkCard } from "@/components/ui/ds";
 import Image from "next/image";
 import Link from "next/link";
 
+// Feature flag: set to true when GrabFood integration is ready
+const GRABFOOD_ENABLED = false;
+
 export default function OrderPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -78,11 +81,13 @@ export default function OrderPage() {
                   alt="Grab"
                   width={28}
                   height={28}
+                  className={!GRABFOOD_ENABLED ? "grayscale" : undefined}
                 />
               }
-              title="Order on GrabFood"
-              subtitle="Delivery via Grab"
+              title={GRABFOOD_ENABLED ? "Order on GrabFood" : "GrabFood — Coming Soon"}
+              subtitle={GRABFOOD_ENABLED ? "Delivery via Grab" : "Stay tuned!"}
               external
+              disabled={!GRABFOOD_ENABLED}
               className="animate-in fade-in slide-in-from-bottom-2 duration-500"
               style={{ animationDelay: "200ms", animationFillMode: "backwards" }}
             />

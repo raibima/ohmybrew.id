@@ -4,16 +4,21 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const linkCardVariants = cva(
-  "group flex w-full items-center gap-4 rounded-xl bg-card p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]",
+  "group flex w-full items-center gap-4 rounded-xl bg-card p-4 transition-all duration-200",
   {
     variants: {
       variant: {
         default: "border border-transparent hover:border-border",
         outlined: "border border-border",
       },
+      disabled: {
+        true: "opacity-50 cursor-not-allowed",
+        false: "hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]",
+      },
     },
     defaultVariants: {
       variant: "default",
+      disabled: false,
     },
   }
 );
@@ -26,11 +31,12 @@ export interface LinkCardProps
   title: string;
   subtitle?: string;
   external?: boolean;
+  disabled?: boolean;
 }
 
 export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
   (
-    { className, variant, href, icon, title, subtitle, external = false, ...props },
+    { className, variant, href, icon, title, subtitle, external = false, disabled = false, ...props },
     ref
   ) => {
     const content = (
@@ -41,7 +47,12 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
           </div>
         )}
         <div className="flex flex-1 flex-col gap-0.5">
-          <span className="font-semibold text-[color:var(--color-omb-soft-ink)] transition-colors group-hover:text-[color:var(--color-omb-red)]">
+          <span className={cn(
+            "font-semibold transition-colors",
+            disabled
+              ? "text-[color:var(--color-omb-warm-grey)]"
+              : "text-[color:var(--color-omb-soft-ink)] group-hover:text-[color:var(--color-omb-red)]"
+          )}>
             {title}
           </span>
           {subtitle && (
@@ -51,7 +62,10 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
           )}
         </div>
         <svg
-          className="h-5 w-5 shrink-0 text-[color:var(--color-omb-warm-grey)] transition-transform group-hover:translate-x-1 group-hover:text-[color:var(--color-omb-red)]"
+          className={cn(
+            "h-5 w-5 shrink-0 text-[color:var(--color-omb-warm-grey)]",
+            !disabled && "transition-transform group-hover:translate-x-1 group-hover:text-[color:var(--color-omb-red)]"
+          )}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -66,6 +80,18 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
       </>
     );
 
+    // Render as non-interactive div when disabled
+    if (disabled) {
+      return (
+        <div
+          className={cn(linkCardVariants({ variant, disabled: true }), className)}
+          {...(props as React.HTMLAttributes<HTMLDivElement>)}
+        >
+          {content}
+        </div>
+      );
+    }
+
     if (external) {
       return (
         <a
@@ -73,7 +99,7 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn(linkCardVariants({ variant }), className)}
+          className={cn(linkCardVariants({ variant, disabled: false }), className)}
           {...props}
         >
           {content}
@@ -85,7 +111,7 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
       <Link
         ref={ref}
         href={href}
-        className={cn(linkCardVariants({ variant }), className)}
+        className={cn(linkCardVariants({ variant, disabled: false }), className)}
         {...props}
       >
         {content}
