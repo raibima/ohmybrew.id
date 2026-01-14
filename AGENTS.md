@@ -64,4 +64,5 @@ Short rules for how AI agents should work on this repo.
   - Use `// TODO` only when blocked by missing decisions or external services.
 - **After editing**:
   - Run `bun lint` and/or `bun run typecheck` (if configured).
+  - Run `bun run test` to run tests. Do not use `bun test` as it has different semantics.
   - Self-review for runtime issues, unused code, and obvious UX/brand mismatches.
