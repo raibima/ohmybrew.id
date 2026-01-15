@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { after } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
 import { checkBotId } from "botid/server";
@@ -79,60 +80,62 @@ export async function POST(request: NextRequest) {
     });
     console.log("[Subscribe API] Email successfully stored in Upstash");
 
-    // Send confirmation email via Resend
-    console.log(
-      "[Subscribe API] Preparing to send confirmation email via Resend..."
-    );
-    try {
-      const emailResult = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "noreply@ohmybrew.id",
-        to: normalizedEmail,
-        subject: "Thanks for signing up! ☕",
-        html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="utf-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #AC0000; font-size: 32px; margin: 0; font-weight: bold;">Oh My Brew</h1>
-              </div>
-              
-              <div style="background-color: #F2F0F6; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
-                <h2 style="color: #333; font-size: 24px; margin-top: 0; margin-bottom: 16px;">Thanks for signing up! ☕</h2>
-                
-                <p style="color: #333; font-size: 16px; margin-bottom: 16px;">
-                  We're thrilled to have you on board! You're now on our list, and we'll be sure to let you know when we're ready to brew.
-                </p>
-                
-                <p style="color: #333; font-size: 16px; margin-bottom: 0;">
-                  Good quality specialty coffee that doesn't take itself too seriously—just your brew, done right.
-                </p>
-              </div>
-              
-              <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #B5B0C5;">
-                <p style="color: #B5B0C5; font-size: 12px; margin: 0;">
-                  BSD, Tangerang
-                </p>
-              </div>
-            </body>
-          </html>
-        `,
-      });
+    // Send confirmation email after response is sent (non-blocking)
+    after(async () => {
       console.log(
-        "[Subscribe API] Confirmation email sent successfully:",
-        emailResult
+        "[Subscribe API] Preparing to send confirmation email via Resend..."
       );
-    } catch (emailError) {
-      // Log email error but don't fail the subscription
-      // The email is already stored in Upstash
-      console.error(
-        "[Subscribe API] Failed to send confirmation email:",
-        emailError
-      );
-    }
+      try {
+        const emailResult = await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL || "noreply@ohmybrew.id",
+          to: normalizedEmail,
+          subject: "Thanks for signing up! ☕",
+          html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              </head>
+              <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                  <h1 style="color: #AC0000; font-size: 32px; margin: 0; font-weight: bold;">Oh My Brew</h1>
+                </div>
+                
+                <div style="background-color: #F2F0F6; border-radius: 12px; padding: 30px; margin-bottom: 20px;">
+                  <h2 style="color: #333; font-size: 24px; margin-top: 0; margin-bottom: 16px;">Thanks for signing up! ☕</h2>
+                  
+                  <p style="color: #333; font-size: 16px; margin-bottom: 16px;">
+                    We're thrilled to have you on board! You're now on our list, and we'll be sure to let you know when we're ready to brew.
+                  </p>
+                  
+                  <p style="color: #333; font-size: 16px; margin-bottom: 0;">
+                    Good quality specialty coffee that doesn't take itself too seriously—just your brew, done right.
+                  </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #B5B0C5;">
+                  <p style="color: #B5B0C5; font-size: 12px; margin: 0;">
+                    BSD, Tangerang
+                  </p>
+                </div>
+              </body>
+            </html>
+          `,
+        });
+        console.log(
+          "[Subscribe API] Confirmation email sent successfully:",
+          emailResult
+        );
+      } catch (emailError) {
+        // Log email error but don't fail the subscription
+        // The email is already stored in Upstash
+        console.error(
+          "[Subscribe API] Failed to send confirmation email:",
+          emailError
+        );
+      }
+    });
 
     console.log("[Subscribe API] Returning success response");
     return NextResponse.json(
