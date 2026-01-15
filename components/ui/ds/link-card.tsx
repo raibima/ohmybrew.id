@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 const linkCardVariants = cva(
-  "group flex w-full items-center gap-4 rounded-xl bg-card p-4 transition-all duration-200",
+  "group flex w-full items-center gap-4 rounded-xl bg-card p-4 transition-all duration-200 [touch-action:manipulation]",
   {
     variants: {
       variant: {
@@ -13,7 +13,7 @@ const linkCardVariants = cva(
       },
       disabled: {
         true: "opacity-50 cursor-not-allowed",
-        false: "hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]",
+        false: "hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:active:scale-100",
       },
     },
     defaultVariants: {
@@ -48,7 +48,7 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
         )}
         <div className="flex flex-1 flex-col gap-0.5">
           <span className={cn(
-            "font-semibold transition-colors",
+            "font-semibold transition-colors motion-reduce:transition-none",
             disabled
               ? "text-[color:var(--color-omb-warm-grey)]"
               : "text-[color:var(--color-omb-soft-ink)] group-hover:text-[color:var(--color-omb-red)]"
@@ -64,12 +64,13 @@ export const LinkCard = React.forwardRef<HTMLAnchorElement, LinkCardProps>(
         <svg
           className={cn(
             "h-5 w-5 shrink-0 text-[color:var(--color-omb-warm-grey)]",
-            !disabled && "transition-transform group-hover:translate-x-1 group-hover:text-[color:var(--color-omb-red)]"
+            !disabled && "transition-transform motion-reduce:transition-none group-hover:translate-x-1 motion-reduce:group-hover:translate-x-0 group-hover:text-[color:var(--color-omb-red)]"
           )}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
           strokeWidth={2}
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
