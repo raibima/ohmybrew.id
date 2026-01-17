@@ -12,6 +12,27 @@
 - **Signature**: Selected house signature drinks built on espresso  
 - **Future direction**: Strong emphasis on high-quality black coffee
 
+## Menu
+
+All prices in IDR.
+
+**Signature White**
+- Creamy Latte - Rp 18,900
+- Strong Latte - Rp 18,900
+- Mint Latte - Rp 18,900
+- Maple Latte - Rp 18,900
+
+**Signature Black**
+- Iced Americano – Rp 46,000
+- Iced Espresso Tonic – Rp 52,000
+- Iced Yuzu Americano – Rp 52,000
+
+**Specialty Classic**
+- Hot Long Black / Americano – Rp 24,900
+- Flat White / Cappuccino – Rp 28,900
+- Magic – Rp 50,000
+- Mocha – Rp 31,000
+
 ## Positioning
 
 - **Value proposition**: Good quality coffee at affordable prices.  

@@ -179,6 +179,12 @@ Use a comfortable, coffee-shop-like reading scale:
 - **Color grading**:
   - Subtle warmth; avoid high saturation. Photos should harmonize with the light background and red accents.
 
+### 4.5 Menu Photography
+
+- **Reference assets**: All menu item photos are available in `/public/menu`.
+- **Usage**: Use these photos consistently across the website, app, and marketing materials to maintain visual consistency.
+- **Guidelines**: Follow the photography principles above—ensure warmth, good lighting, and clean composition that aligns with the brand's cozy, approachable aesthetic.
+
 ---
 
 ## 5. Layout & UI Principles
