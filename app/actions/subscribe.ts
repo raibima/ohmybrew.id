@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+'use server'
+
 import { after } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
@@ -16,74 +17,78 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Email validation regex
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export async function POST(request: NextRequest) {
-  console.log("[Subscribe API] Request received, checking bot id...");
+export type SubscribeState = {
+  success?: boolean;
+  message?: string;
+  error?: string;
+}
+
+export async function subscribeAction(
+  prevState: SubscribeState,
+  formData: FormData
+): Promise<SubscribeState> {
+  console.log("[Subscribe Action] Request received, checking bot id...");
 
   const verification = await checkBotId();
   if (verification.isBot) {
-    console.log("[Subscribe API] Access denied, bot detected");
-    return NextResponse.json(
-      {
-        error: "Access denied",
-      },
-      { status: 403 }
-    );
+    console.log("[Subscribe Action] Access denied, bot detected");
+    return {
+      error: "Access denied",
+    };
   }
 
   try {
-    console.log("[Subscribe API] Bot id verified, parsing request body...");
-    const { email } = await request.json();
-    console.log("[Subscribe API] Request body parsed, email:", email);
+    console.log("[Subscribe Action] Bot id verified, extracting form data...");
+    const email = formData.get("email");
+    console.log("[Subscribe Action] Form data extracted, email:", email);
 
     // Validate email format
-    console.log("[Subscribe API] Validating email format...");
+    console.log("[Subscribe Action] Validating email format...");
     if (!email || typeof email !== "string" || !EMAIL_REGEX.test(email)) {
-      console.log("[Subscribe API] Email validation failed:", {
+      console.log("[Subscribe Action] Email validation failed:", {
         email,
         type: typeof email,
       });
-      return NextResponse.json(
-        { error: "Please provide a valid email address" },
-        { status: 400 }
-      );
+      return {
+        error: "Please provide a valid email address",
+      };
     }
-    console.log("[Subscribe API] Email format is valid");
+    console.log("[Subscribe Action] Email format is valid");
 
     const normalizedEmail = email.toLowerCase().trim();
-    console.log("[Subscribe API] Email normalized:", normalizedEmail);
+    console.log("[Subscribe Action] Email normalized:", normalizedEmail);
 
     // Check if email already exists in Upstash
-    console.log("[Subscribe API] Checking Upstash for existing email...");
+    console.log("[Subscribe Action] Checking Upstash for existing email...");
     const existingEmail = await redis.get(`subscriber:${normalizedEmail}`);
     console.log(
-      "[Subscribe API] Upstash check result:",
+      "[Subscribe Action] Upstash check result:",
       existingEmail ? "Email exists" : "Email not found"
     );
 
     if (existingEmail) {
-      console.log("[Subscribe API] Duplicate email detected, returning 409");
-      return NextResponse.json(
-        { error: "This email is already subscribed!" },
-        { status: 409 }
-      );
+      console.log("[Subscribe Action] Duplicate email detected");
+      return {
+        error: "This email is already subscribed!",
+      };
     }
 
     // Store email in Upstash with timestamp
     const timestamp = new Date().toISOString();
     console.log(
-      "[Subscribe API] Storing email in Upstash with timestamp:",
+      "[Subscribe Action] Storing email in Upstash with timestamp:",
       timestamp
     );
     await redis.set(`subscriber:${normalizedEmail}`, {
       email: normalizedEmail,
       subscribedAt: timestamp,
     });
-    console.log("[Subscribe API] Email successfully stored in Upstash");
+    console.log("[Subscribe Action] Email successfully stored in Upstash");
 
     // Send confirmation email after response is sent (non-blocking)
     after(async () => {
       console.log(
-        "[Subscribe API] Preparing to send confirmation email via Resend..."
+        "[Subscribe Action] Preparing to send confirmation email via Resend..."
       );
       try {
         const emailResult = await resend.emails.send({
@@ -124,32 +129,28 @@ export async function POST(request: NextRequest) {
           `,
         });
         console.log(
-          "[Subscribe API] Confirmation email sent successfully:",
+          "[Subscribe Action] Confirmation email sent successfully:",
           emailResult
         );
       } catch (emailError) {
         // Log email error but don't fail the subscription
         // The email is already stored in Upstash
         console.error(
-          "[Subscribe API] Failed to send confirmation email:",
+          "[Subscribe Action] Failed to send confirmation email:",
           emailError
         );
       }
     });
 
-    console.log("[Subscribe API] Returning success response");
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Successfully subscribed!",
-      },
-      { status: 200 }
-    );
+    console.log("[Subscribe Action] Returning success response");
+    return {
+      success: true,
+      message: "Successfully subscribed!",
+    };
   } catch (error) {
-    console.error("[Subscribe API] Subscription error:", error);
-    return NextResponse.json(
-      { error: "Something went wrong. Please try again later." },
-      { status: 500 }
-    );
+    console.error("[Subscribe Action] Subscription error:", error);
+    return {
+      error: "Something went wrong. Please try again later.",
+    };
   }
 }

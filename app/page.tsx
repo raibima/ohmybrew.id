@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Text } from "@/components/ui/ds/text";
 import { StatusPill } from "@/components/ui/ds/status-pill";
 import { OmbButton } from "@/components/ui/ds/button";
 import { Input } from "@/components/ui/input";
+import { subscribeAction } from "@/app/actions/subscribe";
 
 // Hoist static SVG elements outside component to avoid re-creation on every render
 const LocationIcon = (
@@ -53,11 +54,14 @@ const SuccessCheckmark = (
   </svg>
 );
 
+const initialState = {
+  success: false,
+  message: "",
+  error: "",
+};
+
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [state, formAction, pending] = useActionState(subscribeAction, initialState);
   const emailInputRef = useRef<HTMLInputElement>(null);
 
   // Autofocus on desktop after hydration to avoid mismatch
@@ -66,41 +70,6 @@ export default function Home() {
       emailInputRef.current.focus();
     }
   }, []);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (!email) {
-      setError("Please enter your email address");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      setSubmitted(true);
-      setEmail("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to subscribe");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
@@ -160,8 +129,8 @@ export default function Home() {
 
           {/* Email signup */}
           <div className="w-full max-w-sm">
-            {!submitted ? (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            {!state.success ? (
+              <form action={formAction} className="flex flex-col gap-3">
                 <Text variant="label" size="sm" align="center" tone="muted">
                   Be the first to know about promos
                 </Text>
@@ -174,20 +143,16 @@ export default function Home() {
                       ref={emailInputRef}
                       id="email-input"
                       type="email"
+                      name="email"
                       placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setError("");
-                      }}
                       required
                       className="flex-1"
-                      disabled={loading}
+                      disabled={pending}
                       autoComplete="email"
                       spellCheck={false}
                     />
-                    <OmbButton type="submit" variant="primary" disabled={loading}>
-                      {loading ? (
+                    <OmbButton type="submit" variant="primary" disabled={pending}>
+                      {pending ? (
                         <span className="flex items-center gap-2">
                           <div className="animate-spin">
                             <svg
@@ -218,15 +183,16 @@ export default function Home() {
                       )}
                     </OmbButton>
                   </div>
-                  {error ? (
+                  {state.error ? (
                     <Text
                       variant="caption"
                       size="sm"
                       align="center"
                       className="text-[color:var(--color-omb-red)]"
                       role="alert"
+                      aria-live="polite"
                     >
-                      {error}
+                      {state.error}
                     </Text>
                   ) : null}
                 </div>

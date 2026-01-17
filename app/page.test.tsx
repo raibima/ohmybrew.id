@@ -1,115 +1,87 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Home from "./page";
+import { subscribeAction } from "@/app/actions/subscribe";
 
-// Mock fetch globally
-global.fetch = jest.fn();
+// Mock the server action
+jest.mock("@/app/actions/subscribe", () => ({
+  subscribeAction: jest.fn(),
+}));
+
+// Mock useActionState
+const mockUseActionState = jest.fn();
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useActionState: (...args: unknown[]) => mockUseActionState(...args),
+}));
 
 describe("Home Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default mock implementation for useActionState
+    mockUseActionState.mockImplementation((action, initialState) => {
+      return [initialState, action, false];
+    });
   });
 
   describe("Subscription", () => {
-    it("calls the subscription endpoint with the correct email when form is submitted", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
+    it("renders the subscription form with correct elements", () => {
+      render(<Home />);
+
+      const emailInput = screen.getByPlaceholderText("your@email.com");
+      const submitButton = screen.getByRole("button", { name: /notify me/i });
+
+      expect(emailInput).toBeInTheDocument();
+      expect(emailInput).toHaveAttribute("type", "email");
+      expect(emailInput).toHaveAttribute("name", "email");
+      expect(submitButton).toBeInTheDocument();
+      expect(submitButton).toHaveAttribute("type", "submit");
     });
+
+  it("displays loading state when form is pending", () => {
+    // Mock pending state
+    mockUseActionState.mockReturnValue([
+      { success: false, message: "", error: "" },
+      subscribeAction,
+      true, // pending = true
+    ]);
 
     render(<Home />);
 
     const emailInput = screen.getByPlaceholderText("your@email.com");
     const submitButton = screen.getByRole("button", { name: /notify me/i });
 
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(global.fetch).toHaveBeenCalledWith("/api/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: "test@example.com" }),
-      });
-    });
-  });
-
-  it("displays loading state while API call is pending", async () => {
-    // Create a promise that we can resolve later to simulate pending state
-    let resolveFetch: (value: unknown) => void;
-    const fetchPromise = new Promise((resolve) => {
-      resolveFetch = resolve;
-    });
-
-    (global.fetch as jest.Mock).mockReturnValue(fetchPromise);
-
-    render(<Home />);
-
-    const emailInput = screen.getByPlaceholderText("your@email.com");
-    const submitButton = screen.getByRole("button", { name: /notify me/i });
-
-    fireEvent.change(emailInput, { target: { value: "loading@example.com" } });
-    fireEvent.click(submitButton);
-
-    // Check for loading state immediately after click
-    const loadingButton = screen.getByRole("button", { name: "..." });
-    expect(loadingButton).toBeInTheDocument();
-    expect(loadingButton).toBeDisabled();
+    expect(submitButton).toBeDisabled();
     expect(emailInput).toBeDisabled();
-
-    // Clean up by resolving the promise
-    resolveFetch!({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
-
-    await waitFor(() => {
-        expect(screen.queryByText("...")).not.toBeInTheDocument();
-    });
   });
 
-  it("renders success notification when api call is successful", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
+  it("renders success notification when subscription is successful", () => {
+    // Mock success state
+    mockUseActionState.mockReturnValue([
+      { success: true, message: "Successfully subscribed!", error: "" },
+      subscribeAction,
+      false,
+    ]);
 
     render(<Home />);
 
-    const emailInput = screen.getByPlaceholderText("your@email.com");
-    const submitButton = screen.getByRole("button", { name: /notify me/i });
-
-    fireEvent.change(emailInput, { target: { value: "success@example.com" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/You're in!/i)).toBeInTheDocument();
-      expect(screen.getByText(/We'll keep you posted/i)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/You're in!/i)).toBeInTheDocument();
+    expect(screen.getByText(/We'll keep you posted/i)).toBeInTheDocument();
 
     // Ensure form is no longer visible (replaced by success message)
     expect(screen.queryByPlaceholderText("your@email.com")).not.toBeInTheDocument();
   });
 
-  it("displays error message when api call fails", async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ error: "Invalid email" }),
-    });
+  it("displays error message when subscription fails", () => {
+    // Mock error state
+    mockUseActionState.mockReturnValue([
+      { success: false, message: "", error: "Invalid email" },
+      subscribeAction,
+      false,
+    ]);
 
     render(<Home />);
 
-    const emailInput = screen.getByPlaceholderText("your@email.com");
-    const submitButton = screen.getByRole("button", { name: /notify me/i });
-
-    fireEvent.change(emailInput, { target: { value: "fail@example.com" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("Invalid email")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Invalid email")).toBeInTheDocument();
   });
 });
 
