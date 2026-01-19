@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 // Feature flag: set to true when GrabFood integration is ready
-const GRABFOOD_ENABLED = false;
+const GRABFOOD_ENABLED = true;
 
 export default function OrderPage() {
   return (
