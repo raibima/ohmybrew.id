@@ -2,7 +2,6 @@
 
 - **Name**: Oh My Brew  
 - **Type**: Coffee shop (online orders only for the time being)  
-- **Status**: Coming soon  
 - **Location**: BSD, Tangerang (Indonesia)  
 - **Brand essence**: Playful, cozy, slightly mischievous specialty coffee brand (black cat mascot) that doesn’t take itself too seriously, but is serious about quality.
 
@@ -41,7 +40,7 @@ All prices in IDR.
 ## Operations (Initial Phase)
 
 - **Mode**: Online orders only (no dine-in yet)  
-- **Ordering channels**: TBD (planned: web-based ordering; potential chat-based ordering)  
+- **Ordering channels**: GrabFood & GoFood
 - **Target customers**: Coffee drinkers in BSD/Tangerang interested in better quality, more nuanced coffee at accessible prices.
 
 ## Design & Branding Reference
