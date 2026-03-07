@@ -15,9 +15,9 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Oh My Brew",
+  title: "Oh My Brew — Kopi Specialty BSD, Tangerang | Order via GoFood & GrabFood",
   description:
-    "Good quality specialty coffee at affordable prices. Located in BSD, Tangerang.",
+    "Kopi specialty BSD & Tangerang — Oh My Brew. Rasa fruity & floral, harga terjangkau. Order online via GoFood & GrabFood. Lihat menu & pesan sekarang.",
 };
 
 export default function RootLayout({

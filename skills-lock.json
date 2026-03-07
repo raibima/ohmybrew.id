@@ -1,6 +1,16 @@
 {
   "version": 1,
   "skills": {
+    "brief": {
+      "source": "calm-north/seojuice-skills",
+      "sourceType": "github",
+      "computedHash": "4d2115358a956b37de7a232917fbdf7bc03ad64b6d25a927c8cf1604322b69fb"
+    },
+    "find-keywords": {
+      "source": "calm-north/seojuice-skills",
+      "sourceType": "github",
+      "computedHash": "57ee45205794397994320374741794bf8863419ec92e549fa56279ef871b8e53"
+    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
