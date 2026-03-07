@@ -1,12 +1,7 @@
-"use client";
-
-import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Text } from "@/components/ui/ds/text";
 import { StatusPill } from "@/components/ui/ds/status-pill";
 import { OmbButton } from "@/components/ui/ds/button";
-import { Input } from "@/components/ui/input";
-import { subscribeAction } from "@/app/actions/subscribe";
 
 // Hoist static SVG elements outside component to avoid re-creation on every render
 const LocationIcon = (
@@ -37,179 +32,56 @@ const InstagramIcon = (
   </svg>
 );
 
-const SuccessCheckmark = (
-  <svg
-    className="h-6 w-6 text-[color:var(--color-status-success)]"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    aria-hidden="true"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M5 13l4 4L19 7"
-    />
-  </svg>
-);
-
-const initialState = {
-  success: false,
-  message: "",
-  error: "",
-};
-
 export default function Home() {
-  const [state, formAction, pending] = useActionState(subscribeAction, initialState);
-  const emailInputRef = useRef<HTMLInputElement>(null);
-
-  // Autofocus on desktop after hydration to avoid mismatch
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth >= 768 && emailInputRef.current) {
-      emailInputRef.current.focus();
-    }
-  }, []);
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-background">
       {/* Subtle background pattern */}
       <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-[color:var(--color-omb-red)]/5 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[color:var(--color-omb-electric-brew-blue)]/5 blur-3xl" />
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-(--color-omb-red)/5 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-omb-electric-brew-blue/5 blur-3xl" />
       </div>
 
       <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
-        {/* Content container with entrance animation */}
         <div className="flex max-w-lg flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700 motion-reduce:animate-none motion-reduce:opacity-100">
-          {/* Now Open pill */}
-          <StatusPill className="mb-8">Now Open</StatusPill>
+            <StatusPill className="mb-8">Now Open</StatusPill>
 
-          {/* Brand name */}
-          <h1 className="mb-6 font-display text-6xl leading-tight text-[color:var(--color-omb-red)] sm:text-7xl">
-            Oh My Brew
-          </h1>
+            <h1 className="mb-6 font-display text-6xl leading-tight text-(--color-omb-red) sm:text-7xl">
+              Oh My Brew
+            </h1>
 
-          {/* Tagline */}
-          <Text
-            variant="body"
-            size="lg"
-            align="center"
-            className="mb-4 max-w-md"
-          >
-            Good quality specialty coffee that doesn&apos;t take itself too
-            seriously—just your brew, done right.
-          </Text>
-
-          {/* Location */}
-          <div className="mb-8 flex items-center gap-2 text-[color:var(--color-omb-warm-grey)]">
-            {LocationIcon}
-            <Text variant="caption" size="sm" tone="muted">
-              BSD, Tangerang
-            </Text>
-            <span className="text-[color:var(--color-omb-warm-grey)]">•</span>
-            <a
-              href="https://instagram.com/ohmy.brew"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-[color:var(--color-omb-warm-grey)] hover:text-[color:var(--color-omb-electric-brew-blue)] transition-colors"
-              aria-label="Visit our Instagram"
+            <Text
+              variant="body"
+              size="lg"
+              align="center"
+              className="mb-4 max-w-md"
             >
-              {InstagramIcon}
-              <span className="text-sm">@ohmy.brew</span>
-            </a>
-          </div>
+              Good quality specialty coffee that doesn&apos;t take itself too
+              seriously—just your brew, done right.
+            </Text>
 
-          {/* Order CTA */}
-          <Link href="/order" className="mb-12">
-            <OmbButton variant="primary" size="lg">
-              Order Now
-            </OmbButton>
-          </Link>
+            <div className="mb-8 flex items-center gap-2 text-(--color-omb-warm-grey)">
+              {LocationIcon}
+              <Text variant="caption" size="sm" tone="muted">
+                BSD, Tangerang
+              </Text>
+              <span className="text-(--color-omb-warm-grey)">•</span>
+              <a
+                href="https://instagram.com/ohmy.brew"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-(--color-omb-warm-grey) transition-colors hover:text-(--color-omb-electric-brew-blue)"
+                aria-label="Visit our Instagram"
+              >
+                {InstagramIcon}
+                <span className="text-sm">@ohmy.brew</span>
+              </a>
+            </div>
 
-          {/* Email signup */}
-          <div className="w-full max-w-sm">
-            {!state.success ? (
-              <form action={formAction} className="flex flex-col gap-3">
-                <Text variant="label" size="sm" align="center" tone="muted">
-                  Be the first to know about promos
-                </Text>
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-2">
-                    <label htmlFor="email-input" className="sr-only">
-                      Email address
-                    </label>
-                    <Input
-                      ref={emailInputRef}
-                      id="email-input"
-                      type="email"
-                      name="email"
-                      placeholder="your@email.com"
-                      required
-                      className="flex-1"
-                      disabled={pending}
-                      autoComplete="email"
-                      spellCheck={false}
-                    />
-                    <OmbButton type="submit" variant="primary" disabled={pending}>
-                      {pending ? (
-                        <span className="flex items-center gap-2">
-                          <div className="animate-spin">
-                            <svg
-                              className="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              aria-hidden="true"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                          </div>
-                          Notify Me
-                        </span>
-                      ) : (
-                        "Notify Me"
-                      )}
-                    </OmbButton>
-                  </div>
-                  {state.error ? (
-                    <Text
-                      variant="caption"
-                      size="sm"
-                      align="center"
-                      className="text-[color:var(--color-omb-red)]"
-                      role="alert"
-                      aria-live="polite"
-                    >
-                      {state.error}
-                    </Text>
-                  ) : null}
-                </div>
-              </form>
-            ) : (
-              <div className="rounded-xl bg-card p-6 animate-in fade-in zoom-in-95 duration-300 motion-reduce:animate-none">
-                <div className="mb-2 flex justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-status-success)]/10">
-                    {SuccessCheckmark}
-                  </div>
-                </div>
-                <Text variant="body" size="md" align="center" tone="default">
-                  You&apos;re in! We&apos;ll keep you posted.
-                </Text>
-              </div>
-            )}
-          </div>
+            <Link href="/order" className="mb-12">
+              <OmbButton variant="primary" size="lg">
+                Order Now
+              </OmbButton>
+            </Link>
         </div>
       </main>
     </div>

@@ -1,89 +1,27 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import Home from "./page";
-import { subscribeAction } from "@/app/actions/subscribe";
-
-// Mock the server action
-jest.mock("@/app/actions/subscribe", () => ({
-  subscribeAction: jest.fn(),
-}));
-
-// Mock useActionState
-const mockUseActionState = jest.fn();
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useActionState: (...args: unknown[]) => mockUseActionState(...args),
-}));
 
 describe("Home Page", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    // Default mock implementation for useActionState
-    mockUseActionState.mockImplementation((action, initialState) => {
-      return [initialState, action, false];
-    });
-  });
-
-  describe("Subscription", () => {
-    it("renders the subscription form with correct elements", () => {
+  describe("Content", () => {
+    it("renders the hero heading and tagline", () => {
       render(<Home />);
 
-      const emailInput = screen.getByPlaceholderText("your@email.com");
-      const submitButton = screen.getByRole("button", { name: /notify me/i });
-
-      expect(emailInput).toBeInTheDocument();
-      expect(emailInput).toHaveAttribute("type", "email");
-      expect(emailInput).toHaveAttribute("name", "email");
-      expect(submitButton).toBeInTheDocument();
-      expect(submitButton).toHaveAttribute("type", "submit");
+      expect(
+        screen.getByRole("heading", { name: /oh my brew/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/good quality specialty coffee/i),
+      ).toBeInTheDocument();
     });
 
-  it("displays loading state when form is pending", () => {
-    // Mock pending state
-    mockUseActionState.mockReturnValue([
-      { success: false, message: "", error: "" },
-      subscribeAction,
-      true, // pending = true
-    ]);
+    it("does not render the newsletter subscription form", () => {
+      render(<Home />);
 
-    render(<Home />);
-
-    const emailInput = screen.getByPlaceholderText("your@email.com");
-    const submitButton = screen.getByRole("button", { name: /notify me/i });
-
-    expect(submitButton).toBeDisabled();
-    expect(emailInput).toBeDisabled();
+      expect(screen.queryByPlaceholderText("your@email.com")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /notify me/i })).not.toBeInTheDocument();
+      expect(screen.queryByText(/be the first to know about promos/i)).not.toBeInTheDocument();
+    });
   });
-
-  it("renders success notification when subscription is successful", () => {
-    // Mock success state
-    mockUseActionState.mockReturnValue([
-      { success: true, message: "Successfully subscribed!", error: "" },
-      subscribeAction,
-      false,
-    ]);
-
-    render(<Home />);
-
-    expect(screen.getByText(/You're in!/i)).toBeInTheDocument();
-    expect(screen.getByText(/We'll keep you posted/i)).toBeInTheDocument();
-
-    // Ensure form is no longer visible (replaced by success message)
-    expect(screen.queryByPlaceholderText("your@email.com")).not.toBeInTheDocument();
-  });
-
-  it("displays error message when subscription fails", () => {
-    // Mock error state
-    mockUseActionState.mockReturnValue([
-      { success: false, message: "", error: "Invalid email" },
-      subscribeAction,
-      false,
-    ]);
-
-    render(<Home />);
-
-    expect(screen.getByText("Invalid email")).toBeInTheDocument();
-  });
-});
 
   describe("Navigation", () => {
     it("'Order Now' button navigates to /order route when clicked", () => {

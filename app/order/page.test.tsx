@@ -43,12 +43,12 @@ describe("Order Page", () => {
       expect(goFoodLink).toHaveAttribute("href", "https://gofood.link/a/SharcAY");
     });
 
-    it("displays GrabFood link card with coming soon state", () => {
+    it("displays GrabFood link card", () => {
       render(<OrderPage />);
-      
-      // Since GRABFOOD_ENABLED is false, it should show "Coming Soon"
-      const grabFoodText = screen.getByText(/grabfood — coming soon/i);
-      expect(grabFoodText).toBeInTheDocument();
+
+      const grabFoodLink = screen.getByRole("link", { name: /order on grabfood/i });
+      expect(grabFoodLink).toBeInTheDocument();
+      expect(grabFoodLink).toHaveAttribute("href", "https://r.grab.com/g/2-1-6-C4NFSBXTBCAWGX");
     });
 
     it("displays location information", () => {
