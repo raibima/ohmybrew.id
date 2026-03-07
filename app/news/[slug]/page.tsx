@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { formatBlogDate, getBlogPost, getBlogSlugs } from "@/lib/blog";
+import { formatNewsDate, getNewsPost, getNewsSlugs } from "@/lib/news";
 
-type BlogPostPageProps = {
+type NewsPostPageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
 
 export async function generateStaticParams() {
-  const slugs = await getBlogSlugs();
+  const slugs = await getNewsSlugs();
 
   return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
   params,
-}: BlogPostPageProps): Promise<Metadata> {
+}: NewsPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const post = await getNewsPost(slug);
 
   if (!post) {
     return {
@@ -34,9 +34,9 @@ export async function generateMetadata({
 
 export const dynamicParams = false;
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function NewsPostPage({ params }: NewsPostPageProps) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const post = await getNewsPost(slug);
 
   if (!post) {
     notFound();
@@ -48,7 +48,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <article className="mx-auto max-w-3xl">
       <header className="max-w-2xl">
         <p className="text-sm uppercase tracking-[0.16em] text-[color:var(--color-omb-warm-grey)]">
-          {formatBlogDate(metadata.publishedAt)}
+          {formatNewsDate(metadata.publishedAt)}
         </p>
         <h1 className="mt-4 font-display text-5xl leading-tight text-[color:var(--color-omb-red)] sm:text-6xl">
           {metadata.title}

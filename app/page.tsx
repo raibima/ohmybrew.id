@@ -32,16 +32,22 @@ const InstagramIcon = (
   </svg>
 );
 
-export default function Home() {
+const MailIcon = (
+  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+  </svg>
+);
+
+export function HomePageContent() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-full flex-1 overflow-hidden bg-background">
       {/* Subtle background pattern */}
       <div className="pointer-events-none absolute inset-0 opacity-40">
         <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-(--color-omb-red)/5 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-omb-electric-brew-blue/5 blur-3xl" />
       </div>
 
-      <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
+      <main className="relative flex min-h-full flex-1 flex-col items-center justify-center px-6 py-16">
         <div className="flex max-w-lg flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700 motion-reduce:animate-none motion-reduce:opacity-100">
             <StatusPill className="mb-8">Now Open</StatusPill>
 
@@ -59,12 +65,12 @@ export default function Home() {
               seriously—just your brew, done right.
             </Text>
 
-            <div className="mb-8 flex items-center gap-2 text-(--color-omb-warm-grey)">
+            <div className="mb-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-(--color-omb-warm-grey)">
               {LocationIcon}
               <Text variant="caption" size="sm" tone="muted">
                 BSD, Tangerang
               </Text>
-              <span className="text-(--color-omb-warm-grey)">•</span>
+              <span className="text-(--color-omb-warm-grey)" aria-hidden="true">•</span>
               <a
                 href="https://instagram.com/ohmy.brew"
                 target="_blank"
@@ -74,6 +80,15 @@ export default function Home() {
               >
                 {InstagramIcon}
                 <span className="text-sm">@ohmy.brew</span>
+              </a>
+              <span className="text-(--color-omb-warm-grey)" aria-hidden="true">•</span>
+              <a
+                href="mailto:business@ohmybrew.id"
+                className="flex items-center gap-1.5 text-(--color-omb-warm-grey) transition-colors hover:text-(--color-omb-electric-brew-blue)"
+                aria-label="Email us at business@ohmybrew.id"
+              >
+                {MailIcon}
+                <span className="text-sm">business@ohmybrew.id</span>
               </a>
             </div>
 
@@ -86,4 +101,8 @@ export default function Home() {
       </main>
     </div>
   );
+}
+
+export default async function Home() {
+  return <HomePageContent />;
 }

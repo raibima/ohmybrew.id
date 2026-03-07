@@ -1,43 +1,21 @@
 import { Text, LinkCard } from "@/components/ui/ds";
 import Image from "next/image";
-import Link from "next/link";
 
 // Feature flag: set to true when GrabFood integration is ready
 const GRABFOOD_ENABLED = true;
 
 export default function OrderPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
+    <div className="relative min-h-full flex-1 overflow-hidden bg-background">
       {/* Subtle background pattern */}
       <div className="pointer-events-none absolute inset-0 opacity-40">
         <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-(--color-omb-red)/5 blur-3xl" />
         <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-omb-electric-brew-blue/5 blur-3xl" />
       </div>
 
-      <main className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
+      <main className="relative flex min-h-full flex-1 flex-col items-center justify-center px-6 py-16">
         {/* Content container with entrance animation */}
         <div className="flex w-full max-w-md flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {/* Back link */}
-          <Link
-            href="/"
-            className="mb-8 flex items-center gap-2 text-sm text-(--color-omb-warm-grey) transition-colors hover:text-(--color-omb-soft-ink)"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to home
-          </Link>
-
           {/* Brand heading */}
           <h1 className="mb-4 font-display text-5xl leading-tight text-(--color-omb-red) sm:text-6xl">
             Order Now

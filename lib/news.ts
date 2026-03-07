@@ -2,30 +2,30 @@ import { readdir } from "node:fs/promises";
 import path from "node:path";
 import { cache, type ComponentType } from "react";
 
-export type BlogPostMetadata = {
+export type NewsPostMetadata = {
   title: string;
   description: string;
   publishedAt: string;
   excerpt?: string;
 };
 
-type BlogPostModule = {
+type NewsPostModule = {
   default: ComponentType;
-  metadata: BlogPostMetadata;
+  metadata: NewsPostMetadata;
 };
 
-export type BlogPostSummary = BlogPostMetadata & {
+export type NewsPostSummary = NewsPostMetadata & {
   slug: string;
 };
 
-const BLOG_DIRECTORY = path.join(process.cwd(), "content", "blog");
+const NEWS_DIRECTORY = path.join(process.cwd(), "content", "news");
 
-async function importBlogPost(slug: string): Promise<BlogPostModule> {
-  return import(`@/content/blog/${slug}.mdx`);
+async function importNewsPost(slug: string): Promise<NewsPostModule> {
+  return import(`@/content/news/${slug}.mdx`);
 }
 
-export const getBlogSlugs = cache(async () => {
-  const entries = await readdir(BLOG_DIRECTORY, { withFileTypes: true });
+export const getNewsSlugs = cache(async () => {
+  const entries = await readdir(NEWS_DIRECTORY, { withFileTypes: true });
 
   return entries
     .filter((entry) => entry.isFile() && entry.name.endsWith(".mdx"))
@@ -33,11 +33,11 @@ export const getBlogSlugs = cache(async () => {
     .toSorted((left, right) => left.localeCompare(right));
 });
 
-export const getAllBlogPosts = cache(async (): Promise<BlogPostSummary[]> => {
-  const slugs = await getBlogSlugs();
+export const getAllNewsPosts = cache(async (): Promise<NewsPostSummary[]> => {
+  const slugs = await getNewsSlugs();
   const posts = await Promise.all(
     slugs.map(async (slug) => {
-      const { metadata } = await importBlogPost(slug);
+      const { metadata } = await importNewsPost(slug);
 
       return {
         slug,
@@ -52,14 +52,19 @@ export const getAllBlogPosts = cache(async (): Promise<BlogPostSummary[]> => {
   );
 });
 
-export const getBlogPost = cache(async (slug: string) => {
-  const slugs = await getBlogSlugs();
+export const getLatestNewsPosts = cache(async (limit: number) => {
+  const posts = await getAllNewsPosts();
+  return posts.slice(0, limit);
+});
+
+export const getNewsPost = cache(async (slug: string) => {
+  const slugs = await getNewsSlugs();
 
   if (!slugs.includes(slug)) {
     return null;
   }
 
-  const post = await importBlogPost(slug);
+  const post = await importNewsPost(slug);
 
   return {
     slug,
@@ -67,7 +72,7 @@ export const getBlogPost = cache(async (slug: string) => {
   };
 });
 
-export function formatBlogDate(date: string) {
+export function formatNewsDate(date: string) {
   return new Intl.DateTimeFormat("en", {
     day: "numeric",
     month: "long",
