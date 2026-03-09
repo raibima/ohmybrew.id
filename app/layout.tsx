@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Pacifico, Nunito } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -25,8 +26,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+
   return (
     <html lang="en">
+      {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
       <head>
         <link
           rel="icon"
