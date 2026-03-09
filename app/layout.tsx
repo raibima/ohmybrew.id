@@ -16,7 +16,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Oh My Brew — Kopi Specialty BSD, Tangerang | Order via GoFood & GrabFood",
+  title:
+    "Oh My Brew — Kopi Specialty BSD, Tangerang | Order via GoFood & GrabFood",
   description:
     "Kopi specialty BSD & Tangerang — Oh My Brew. Rasa fruity & floral, harga terjangkau. Order online via GoFood & GrabFood. Lihat menu & pesan sekarang.",
 };
@@ -32,16 +33,31 @@ export default function RootLayout({
     <html lang="en">
       {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
       <head>
+        <link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" />
+        <link rel="apple-touch-icon" sizes="48x48" href="/favicon/favicon-48x48.png" />
+        <link rel="apple-touch-icon" sizes="72x72" href="/favicon/favicon-72x72.png" />
+        <link rel="apple-touch-icon" sizes="96x96" href="/favicon/favicon-96x96.png" />
         <link
-          rel="icon"
-          href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>"
+          rel="apple-touch-icon"
+          sizes="256x256"
+          href="/favicon/favicon-256x256.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="384x384"
+          href="/favicon/favicon-384x384.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="512x512"
+          href="/favicon/favicon-512x512.png"
         />
       </head>
-      <body className={`${pacifico.variable} ${nunito.variable} flex min-h-screen flex-col antialiased`}>
+      <body
+        className={`${pacifico.variable} ${nunito.variable} flex min-h-screen flex-col antialiased`}
+      >
         <SiteHeader />
-        <div className="min-h-0 flex-1 flex flex-col">
-          {children}
-        </div>
+        <div className="min-h-0 flex-1 flex flex-col">{children}</div>
       </body>
     </html>
   );
