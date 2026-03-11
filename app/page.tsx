@@ -65,7 +65,7 @@ export function HomePageContent() {
               seriously—just your brew, done right.
             </Text>
 
-            <div className="mb-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-(--color-omb-warm-grey)">
+            <div className="mb-6 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-(--color-omb-warm-grey)">
               {LocationIcon}
               <Text variant="caption" size="sm" tone="muted">
                 BSD, Tangerang
@@ -92,17 +92,19 @@ export function HomePageContent() {
               </a>
             </div>
 
-            <Link href="/order" className="mb-12">
-              <OmbButton variant="primary" size="lg">
-                Order Now
-              </OmbButton>
-            </Link>
+            <div className="mb-8">
+              <Link href="/order">
+                <OmbButton variant="primary" size="lg">
+                  Order Now
+                </OmbButton>
+              </Link>
+            </div>
         </div>
       </main>
     </div>
   );
 }
 
-export default async function Home() {
+export default function Home() {
   return <HomePageContent />;
 }

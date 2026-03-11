@@ -69,6 +69,18 @@ export default function OrderPage() {
               className="animate-in fade-in slide-in-from-bottom-2 duration-500"
               style={{ animationDelay: "200ms", animationFillMode: "backwards" }}
             />
+            <LinkCard
+              href="/catering"
+              icon={
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-omb-red)/10 text-(--color-omb-red)">
+                  <span className="text-xs font-semibold">☕</span>
+                </div>
+              }
+              title="Corporate & Event Catering"
+              subtitle="Coffee setups for offices & events"
+              className="animate-in fade-in slide-in-from-bottom-2 duration-500"
+              style={{ animationDelay: "300ms", animationFillMode: "backwards" }}
+            />
           </div>
 
           {/* Footer note */}
