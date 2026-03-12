@@ -15,10 +15,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-omb-warm-grey/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-6 sm:px-8 lg:px-12">
+      <div className="mx-auto flex min-h-14 max-w-5xl items-center justify-between gap-4 px-6 py-2 sm:px-8 sm:py-2.5 lg:px-12">
         <Link
           href="/"
-          className="font-display text-xl text-(--color-omb-red) transition-colors hover:text-(--color-omb-red)/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-omb-electric-brew-blue)"
+          className="flex items-center font-display text-xl leading-tight text-(--color-omb-red) py-1.5 transition-colors hover:text-(--color-omb-red)/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-omb-electric-brew-blue)"
           aria-label="Oh My Brew – Home"
         >
           Oh My Brew
