@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Text } from "@/components/ui/ds/text";
 import { StatusPill } from "@/components/ui/ds/status-pill";
 import { OmbButton } from "@/components/ui/ds/button";
 
 export const metadata: Metadata = {
   title:
-    "Corporate & Event Coffee Catering in BSD, Tangerang — Oh My Brew",
+    "Coffee Catering Jakarta — Corporate & Event | Oh My Brew",
   description:
-    "Specialty coffee catering for offices and events in BSD & Tangerang. Flexible formats, barista-led coffee bars, and memorable brews for teams, launches, and gatherings. Email business@ohmybrew.id or chat via WhatsApp to plan your setup.",
+    "Event coffee service and office coffee catering in Jakarta. Specialty coffee for launches, seminars, and offices. Catering kopi kantor dan acara. Barista bars, pre-batched, or coffee corner—email or WhatsApp to plan.",
 };
 
 const EMAIL_ADDRESS = "business@ohmybrew.id";
@@ -38,11 +37,11 @@ export default function CateringPage() {
               id="catering-hero-heading"
               className="mb-4 font-display text-4xl leading-tight text-(--color-omb-red) sm:text-5xl"
             >
-              Coffee that makes your{" "}
+              Coffee catering{" "}
               <span className="underline decoration-omb-electric-brew-blue/60 decoration-2 underline-offset-4">
-                office &amp; events
+                Jakarta
               </span>{" "}
-              feel curated.
+              for offices &amp; events.
             </h1>
             <Text
               variant="body"
@@ -50,10 +49,10 @@ export default function CateringPage() {
               tone="default"
               className="mb-6 max-w-xl"
             >
-              Oh My Brew brings specialty coffee catering to offices and events
-              in BSD &amp; Tangerang—so your guests remember more than just the
-              slides. Flexible formats, coffee-first menus, and a team that
-              helps you plan the right setup.
+              Oh My Brew offers event coffee service and office coffee catering
+              in Jakarta. Flexible formats,
+              coffee-first menus, and a team that helps you plan the right
+              setup.
             </Text>
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <a href={`mailto:${EMAIL_ADDRESS}`}>
@@ -90,7 +89,7 @@ export default function CateringPage() {
                   Sample event setup
                 </Text>
                 <span className="rounded-full bg-(--color-omb-red)/10 px-3 py-1 text-xs font-medium text-(--color-omb-red)">
-                  BSD office
+                  Jakarta office
                 </span>
               </div>
               <Text
@@ -116,18 +115,23 @@ export default function CateringPage() {
           </div>
         </section>
 
-        {/* Who this is for */}
+        {/* Who this is for — Office coffee catering & event coffee service */}
         <section aria-labelledby="catering-who-heading" className="space-y-6">
           <div className="max-w-2xl">
             <h2
               id="catering-who-heading"
               className="mb-2 font-display text-2xl text-(--color-omb-red)"
             >
-              Built for offices, events, and teams that care about coffee.
+              Office coffee catering &amp; event coffee service.
             </h2>
             <Text variant="body" size="md" tone="default">
-              If you&apos;re planning for people and want coffee that feels
-              intentional—not an afterthought—we&apos;re for you.
+              Coffee catering Jakarta for teams that care: if you&apos;re
+              planning for people and want coffee that feels intentional—not an
+              afterthought—we&apos;re for you.
+            </Text>
+            <Text variant="caption" size="sm" tone="muted" className="mt-2">
+              Service area: Jakarta (and surrounding areas, subject to
+              logistics).
             </Text>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -249,14 +253,14 @@ export default function CateringPage() {
           </div>
         </section>
 
-        {/* Example setups / use cases */}
+        {/* Example setups / use cases — event coffee service formats */}
         <section aria-labelledby="catering-examples-heading" className="space-y-6">
           <div className="max-w-2xl">
             <h2
               id="catering-examples-heading"
               className="mb-2 font-display text-2xl text-(--color-omb-red)"
             >
-              Example setups &amp; use cases
+              Event coffee service: setups &amp; use cases
             </h2>
             <Text variant="body" size="md" tone="default">
               Every company and event is different, but these are some of the
@@ -311,6 +315,63 @@ export default function CateringPage() {
               </Text>
             </article>
           </div>
+        </section>
+
+        {/* FAQ — long-tail: how to order, event coffee package options */}
+        <section
+          aria-labelledby="catering-faq-heading"
+          className="space-y-4 rounded-3xl border border-omb-warm-grey/40 bg-off-white/70 p-6 md:p-8"
+        >
+          <h2
+            id="catering-faq-heading"
+            className="font-display text-2xl text-(--color-omb-red)"
+          >
+            Frequently asked
+          </h2>
+          <ul className="space-y-6">
+            <li>
+              <Text as="h3" variant="heading" size="sm" className="mb-1">
+                How do I order coffee for an office event?
+              </Text>
+              <Text variant="body" size="sm" tone="default">
+                Reach out via email or WhatsApp with your date, headcount, and
+                rough budget. We&apos;ll suggest formats (barista bar,
+                pre-batched, or coffee corner) and a menu—then we lock in
+                logistics and show up on the day.                 No online checkout; everything
+                is tailored.{" "}
+                <a
+                  href={`mailto:${EMAIL_ADDRESS}`}
+                  className="font-medium text-(--color-omb-red) underline underline-offset-2 hover:no-underline"
+                >
+                  Get in touch
+                </a>
+                .
+              </Text>
+            </li>
+            <li>
+              <Text as="h3" variant="heading" size="sm" className="mb-1">
+                What event coffee package options do you offer?
+              </Text>
+              <Text variant="body" size="sm" tone="default">
+                We offer an <strong>Office Coffee Bar</strong> (pop-up bar with
+                baristas), <strong>Event Coffee Corner</strong> (branded corner
+                at your venue), and <strong>Pre-batched &amp; Delivered</strong>{" "}
+                (ready-to-pour for smaller or internal meetings). Menu size,
+                service window, and pricing depend on headcount and location—we
+                send a simple proposal after you contact us.
+              </Text>
+            </li>
+            <li>
+              <Text as="h3" variant="heading" size="sm" className="mb-1">
+                Which areas do you cover for coffee catering?
+              </Text>
+              <Text variant="body" size="sm" tone="default">
+                We cover Jakarta and surrounding areas depending on date and
+                scale. Tell us your venue when you reach out and we&apos;ll
+                confirm availability.
+              </Text>
+            </li>
+          </ul>
         </section>
 
         {/* Final CTA */}
