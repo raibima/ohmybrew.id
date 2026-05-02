@@ -6,6 +6,12 @@
       "sourceType": "github",
       "computedHash": "4d2115358a956b37de7a232917fbdf7bc03ad64b6d25a927c8cf1604322b69fb"
     },
+    "chat-sdk": {
+      "source": "vercel/chat",
+      "sourceType": "github",
+      "skillPath": "skills/chat/SKILL.md",
+      "computedHash": "eac44bca0c67339cb4abf9c3c9252e1888f42cb9c8d2d8bc5d3c7540641fc93d"
+    },
     "find-keywords": {
       "source": "calm-north/seojuice-skills",
       "sourceType": "github",
