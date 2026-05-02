@@ -1,4 +1,5 @@
 import { createRedisState, type RedisStateAdapter } from "@chat-adapter/state-redis";
+import { getStateConfig } from "@/lib/config";
 
 let stateAdapter: RedisStateAdapter | undefined;
 
@@ -10,7 +11,8 @@ let stateAdapter: RedisStateAdapter | undefined;
  */
 export function getStateAdapter(): RedisStateAdapter {
 	if (!stateAdapter) {
-		stateAdapter = createRedisState();
+		const config = getStateConfig();
+		stateAdapter = createRedisState({ url: config.redisUrl });
 	}
 
 	return stateAdapter;

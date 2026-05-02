@@ -12,3 +12,6 @@ Before any Next.js work, find and read the relevant doc in `node_modules/next/di
 - Always test your changes by running `bun run build`.
 - Run `bun run test` to run tests. Do not use `bun test` as it has different semantics.
 - Make it secure.
+
+All code must adhere to:
+- Clean Code principles, including the Single Responsibility Principle.

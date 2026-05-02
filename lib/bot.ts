@@ -1,6 +1,7 @@
 import { Chat } from "chat";
 import { createTelegramAdapter } from "@chat-adapter/telegram";
 import { getAgent } from "@/lib/agent";
+import { getTelegramConfig } from "@/lib/config";
 import {
 	buildMemoryMessages,
 	loadSessionMemory,
@@ -12,11 +13,7 @@ import { getStateAdapter } from "@/lib/state";
 /**
  * Oh My Brew Telegram bot.
  *
- * Reads config from env:
- * - TELEGRAM_BOT_TOKEN            (required)
- * - TELEGRAM_WEBHOOK_SECRET_TOKEN (recommended — verifies Telegram webhook calls)
- * - TELEGRAM_BOT_USERNAME         (optional, auto-detected via getMe)
- * - REDIS_URL                     (required in production for state/dedupe/locks)
+ * Reads validated runtime config via `lib/config.ts`.
  *
  * The bot is constructed lazily (singleton) to avoid the Telegram adapter
  * blowing up at Next.js build time when env vars aren't loaded yet (e.g.
@@ -69,14 +66,17 @@ export function getBot(): Bot {
 }
 
 function createBot(): Bot {
-	const userName = process.env.TELEGRAM_BOT_USERNAME ?? "ohmybrew_bot";
+	const telegramConfig = getTelegramConfig();
 
 	return new Chat({
-		userName,
+		userName: telegramConfig.botUsername,
 		adapters: {
 			telegram: createTelegramAdapter({
+				botToken: telegramConfig.botToken,
 				// On Vercel this resolves to "webhook"; locally it falls back to polling.
 				mode: "auto",
+				secretToken: telegramConfig.webhookSecretToken,
+				userName: telegramConfig.botUsername,
 			}),
 		},
 		state: getStateAdapter(),

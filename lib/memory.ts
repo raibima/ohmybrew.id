@@ -1,9 +1,9 @@
 import { generateText, jsonSchema, Output, type ModelMessage } from "ai";
-import { openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import type { Message } from "chat";
+import { getAiConfig } from "@/lib/config";
 import { getStateAdapter } from "@/lib/state";
 
-const MEMORY_MODEL = "gpt-5.4-mini";
 const MEMORY_KEY_PREFIX = "memory:dm";
 const MAX_RECENT_TURNS = 20;
 const MAX_FACTS = 24;
@@ -131,8 +131,10 @@ export async function updateSessionMemory({
 	};
 
 	try {
+		const config = getAiConfig();
+		const openai = createOpenAI({ apiKey: config.apiKey });
 		const extraction = await generateText({
-			model: openai(MEMORY_MODEL),
+			model: openai(config.memoryModel),
 			output: Output.object({
 				schema: memoryUpdateSchema,
 				name: "memory_update",
