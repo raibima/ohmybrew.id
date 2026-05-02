@@ -165,11 +165,15 @@ async function persistConversationTurn({
 }): Promise<void> {
 	if (!assistantText) return;
 
-	await updateSessionMemory({
-		assistantText,
-		memory,
-		userText,
-	});
+	try {
+		await updateSessionMemory({
+			assistantText,
+			memory,
+			userText,
+		});
+	} catch (err) {
+		console.warn("[bot] memory persistence failed after successful reply", err);
+	}
 }
 
 /**
