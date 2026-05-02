@@ -25,17 +25,9 @@ export async function maybeHandleMemoryDebugCommand(
 	const { command, rest } = parseCommand(text);
 	if (!command) return null;
 
-	if (command === "/debug_memory_id") {
-		return [
-			"Your Telegram debug author ID:",
-			message.author.userId,
-			"",
-			"Enable memory debug locally with TELEGRAM_MEMORY_DEBUG=1.",
-			"Optionally restrict it with TELEGRAM_MEMORY_DEBUG_USER_IDS=" + message.author.userId,
-		].join("\n");
-	}
-
 	if (!DEBUG_COMMANDS.has(command)) return null;
+
+	if (command === "/debug_memory_id") return getDebugAuthorIdText(message);
 
 	const gate = getDebugGate(message);
 	if (!gate.allowed) return gate.message;
@@ -78,11 +70,23 @@ function parseCommand(text: string): { command: string | null; rest: string } {
 	return { command: null, rest: "" };
 }
 
+function getDebugAuthorIdText(message: Message): string {
+	if (!isLocalDevelopment()) return getDevelopmentOnlyMessage();
+
+	return [
+		"Your Telegram debug author ID:",
+		message.author.userId,
+		"",
+		"Enable memory debug locally with TELEGRAM_MEMORY_DEBUG=1.",
+		"Optionally restrict it with TELEGRAM_MEMORY_DEBUG_USER_IDS=" + message.author.userId,
+	].join("\n");
+}
+
 function getDebugGate(message: Message): { allowed: true } | { allowed: false; message: string } {
-	if (process.env.NODE_ENV !== "development") {
+	if (!isLocalDevelopment()) {
 		return {
 			allowed: false,
-			message: "Memory debug commands are only available in local development.",
+			message: getDevelopmentOnlyMessage(),
 		};
 	}
 
@@ -106,6 +110,14 @@ function getDebugGate(message: Message): { allowed: true } | { allowed: false; m
 	}
 
 	return { allowed: true };
+}
+
+function isLocalDevelopment(): boolean {
+	return process.env.NODE_ENV === "development";
+}
+
+function getDevelopmentOnlyMessage(): string {
+	return "Memory debug commands are only available in local development.";
 }
 
 function parseAllowedIds(value: string | undefined): string[] {
