@@ -1,4 +1,4 @@
-import { generateText, type ModelMessage } from "ai";
+import { generateText, jsonSchema, Output, type ModelMessage } from "ai";
 import { openai } from "@ai-sdk/openai";
 import type { Message } from "chat";
 import { getStateAdapter } from "@/lib/state";
@@ -25,9 +25,45 @@ export interface SessionMemory {
 }
 
 interface MemoryUpdate {
-	facts?: unknown;
-	stableSummary?: unknown;
+	facts: string[];
+	stableSummary: string;
 }
+
+const memoryUpdateSchema = jsonSchema<MemoryUpdate>(
+	{
+		type: "object",
+		properties: {
+			stableSummary: {
+				type: "string",
+				maxLength: MAX_SUMMARY_LENGTH,
+				description: "Concise stable summary of useful long-term context.",
+			},
+			facts: {
+				type: "array",
+				maxItems: MAX_FACTS,
+				items: {
+					type: "string",
+					maxLength: MAX_FACT_LENGTH,
+				},
+				description: "Short durable user facts, preferences, and recurring needs.",
+			},
+		},
+		required: ["stableSummary", "facts"],
+		additionalProperties: false,
+	},
+	{
+		validate(value) {
+			if (!isMemoryUpdate(value)) {
+				return {
+					success: false,
+					error: new Error("Invalid memory update shape"),
+				};
+			}
+
+			return { success: true, value };
+		},
+	},
+);
 
 export function getMemoryKey(message: Message): string {
 	return getMemoryKeyFromThreadId(message.threadId);
@@ -97,9 +133,13 @@ export async function updateSessionMemory({
 	try {
 		const extraction = await generateText({
 			model: openai(MEMORY_MODEL),
+			output: Output.object({
+				schema: memoryUpdateSchema,
+				name: "memory_update",
+				description: "Updated long-term memory for a DM-only Telegram coffee-shop bot.",
+			}),
 			system: [
 				"You update long-term memory for a DM-only Telegram coffee-shop bot.",
-				"Return ONLY compact JSON with keys stableSummary and facts.",
 				"Keep useful user preferences, stable personal facts, recurring ordering needs, and important business context.",
 				"Do not store secrets, payment details, one-time delivery codes, or sensitive personal data.",
 				`Keep stableSummary under ${MAX_SUMMARY_LENGTH} characters and facts under ${MAX_FACTS} short strings.`,
@@ -116,7 +156,7 @@ export async function updateSessionMemory({
 			}),
 		});
 
-		const parsed = parseMemoryUpdate(extraction.text);
+		const parsed = extraction.output;
 		nextMemory.facts = normalizeFacts(parsed.facts, nextMemory.facts);
 		nextMemory.stableSummary = normalizeSummary(
 			parsed.stableSummary,
@@ -222,14 +262,14 @@ function normalizeSummary(value: unknown, fallback: string): string {
 	return truncate(value.trim(), MAX_SUMMARY_LENGTH);
 }
 
-function parseMemoryUpdate(text: string): MemoryUpdate {
-	const trimmed = text.trim();
-	const withoutFence = trimmed
-		.replace(/^```(?:json)?\s*/i, "")
-		.replace(/\s*```$/i, "")
-		.trim();
-
-	return JSON.parse(withoutFence) as MemoryUpdate;
+function isMemoryUpdate(value: unknown): value is MemoryUpdate {
+	return (
+		typeof value === "object" &&
+		value !== null &&
+		Array.isArray((value as MemoryUpdate).facts) &&
+		(value as MemoryUpdate).facts.every((fact) => typeof fact === "string") &&
+		typeof (value as MemoryUpdate).stableSummary === "string"
+	);
 }
 
 function formatMemoryContext(memory: SessionMemory): string {
