@@ -1,10 +1,11 @@
-import { Chat } from "chat";
+import { Chat, type Message, type Thread } from "chat";
 import { createTelegramAdapter } from "@chat-adapter/telegram";
 import { getAgent } from "@/lib/agent";
 import { getTelegramConfig } from "@/lib/config";
 import {
 	buildMemoryMessages,
 	loadSessionMemory,
+	type SessionMemory,
 	updateSessionMemory,
 } from "@/lib/memory";
 import { maybeHandleMemoryDebugCommand } from "@/lib/memory-debug";
@@ -85,46 +86,89 @@ function createBot(): Bot {
 }
 
 function registerHandlers(bot: Bot): void {
-	bot.onDirectMessage(async (thread, message) => {
-		const text = message.text?.trim();
-		if (!text) return;
+	bot.onDirectMessage(handleDirectMessage);
+}
 
-		try {
-			const debugResponse = await maybeHandleMemoryDebugCommand(message, text);
-			if (debugResponse) {
-				await thread.post(debugResponse);
-				return;
-			}
+async function handleDirectMessage(thread: Thread, message: Message): Promise<void> {
+	const text = parseDirectMessageText(message);
+	if (!text) return;
 
-			await thread.startTyping();
-			const memory = await loadSessionMemory(message);
-			const result = await getAgent().stream({
-				messages: buildMemoryMessages(memory, text),
-			});
+	try {
+		if (await handleMemoryDebugCommand(thread, message, text)) return;
+		await replyWithAgent(thread, message, text);
+	} catch (err) {
+		console.error("[bot] AI reply failed", err);
+		await thread.post(
+			"Duh, otakku lagi macet kayak mesin espresso dingin ☕️ — coba lagi sebentar ya.",
+		);
+	}
+}
 
-			let assistantText = "";
-			async function* collectTextStream(): AsyncIterable<string> {
-				for await (const delta of result.textStream) {
-					assistantText += delta;
-					yield delta;
-				}
-			}
+function parseDirectMessageText(message: Message): string | null {
+	const text = message.text?.trim();
+	return text || null;
+}
 
-			await thread.post(collectTextStream());
+async function handleMemoryDebugCommand(
+	thread: Thread,
+	message: Message,
+	text: string,
+): Promise<boolean> {
+	const debugResponse = await maybeHandleMemoryDebugCommand(message, text);
+	if (!debugResponse) return false;
 
-			if (assistantText.trim()) {
-				await updateSessionMemory({
-					assistantText: assistantText.trim(),
-					memory,
-					userText: text,
-				});
-			}
-		} catch (err) {
-			console.error("[bot] AI reply failed", err);
-			await thread.post(
-				"Duh, otakku lagi macet kayak mesin espresso dingin ☕️ — coba lagi sebentar ya.",
-			);
+	await thread.post(debugResponse);
+	return true;
+}
+
+async function replyWithAgent(
+	thread: Thread,
+	message: Message,
+	userText: string,
+): Promise<void> {
+	await thread.startTyping();
+
+	const memory = await loadSessionMemory(message);
+	const result = await getAgent().stream({
+		messages: buildMemoryMessages(memory, userText),
+	});
+	const assistantText = await streamAndCollectText(thread, result.textStream);
+
+	await persistConversationTurn({ assistantText, memory, userText });
+}
+
+async function streamAndCollectText(
+	thread: Thread,
+	textStream: AsyncIterable<string>,
+): Promise<string> {
+	let assistantText = "";
+
+	async function* collectTextStream(): AsyncIterable<string> {
+		for await (const delta of textStream) {
+			assistantText += delta;
+			yield delta;
 		}
+	}
+
+	await thread.post(collectTextStream());
+	return assistantText.trim();
+}
+
+async function persistConversationTurn({
+	assistantText,
+	memory,
+	userText,
+}: {
+	assistantText: string;
+	memory: SessionMemory;
+	userText: string;
+}): Promise<void> {
+	if (!assistantText) return;
+
+	await updateSessionMemory({
+		assistantText,
+		memory,
+		userText,
 	});
 }
 
