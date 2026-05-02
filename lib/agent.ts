@@ -1,6 +1,6 @@
 import { ToolLoopAgent } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
-import { getAiConfig } from "@/lib/config";
+import { getAiConfig, type AiConfig } from "@/lib/config";
 import { BRAND_SYSTEM_PROMPT } from "@/lib/prompts/brand";
 
 /**
@@ -8,16 +8,19 @@ import { BRAND_SYSTEM_PROMPT } from "@/lib/prompts/brand";
  */
 let agent: ToolLoopAgent | undefined;
 
-export function getAgent(): ToolLoopAgent {
-	if (agent) return agent;
-
-	const config = getAiConfig();
+export function createAgent(config: AiConfig): ToolLoopAgent {
 	const openai = createOpenAI({ apiKey: config.apiKey });
 
-	agent = new ToolLoopAgent({
+	return new ToolLoopAgent({
 		model: openai(config.chatModel),
 		instructions: BRAND_SYSTEM_PROMPT,
 	});
+}
+
+export function getAgent(): ToolLoopAgent {
+	if (!agent) {
+		agent = createAgent(getAiConfig());
+	}
 
 	return agent;
 }

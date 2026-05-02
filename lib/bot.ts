@@ -1,7 +1,8 @@
-import { Chat, type Message, type Thread } from "chat";
+import { Chat, type Adapter, type Message, type StateAdapter, type Thread } from "chat";
 import { createTelegramAdapter } from "@chat-adapter/telegram";
+import type { Agent } from "ai";
 import { getAgent } from "@/lib/agent";
-import { getTelegramConfig } from "@/lib/config";
+import { getTelegramConfig, type TelegramConfig } from "@/lib/config";
 import {
 	buildMemoryMessages,
 	loadSessionMemory,
@@ -21,7 +22,29 @@ import { getStateAdapter } from "@/lib/state";
  * during static page-data collection).
  */
 
-type Bot = Chat<{ telegram: ReturnType<typeof createTelegramAdapter> }>;
+type TelegramAdapter = Adapter;
+type Bot = Chat<{ telegram: TelegramAdapter }>;
+type BotAgent = Pick<Agent, "stream">;
+type MemoryLoader = typeof loadSessionMemory;
+type MemoryUpdater = typeof updateSessionMemory;
+type MemoryDebugHandler = typeof maybeHandleMemoryDebugCommand;
+
+export interface CreateBotDependencies {
+	agent: BotAgent;
+	debugCommandHandler: MemoryDebugHandler;
+	memoryLoader: MemoryLoader;
+	memoryUpdater: MemoryUpdater;
+	state: StateAdapter;
+	telegramAdapter: TelegramAdapter;
+	telegramConfig: Pick<TelegramConfig, "botUsername">;
+}
+
+interface DirectMessageDependencies {
+	agent: BotAgent;
+	debugCommandHandler: MemoryDebugHandler;
+	memoryLoader: MemoryLoader;
+	memoryUpdater: MemoryUpdater;
+}
 
 // Telegram retries webhooks aggressively on non-2xx responses; dedupe for 10 min.
 const DEDUPE_TTL_MS = 10 * 60 * 1000;
@@ -47,8 +70,7 @@ interface ViteLikeHot {
 export function getBot(): Bot {
 	if (globalThis.__ohmybrewBot) return globalThis.__ohmybrewBot;
 
-	const instance = createBot();
-	registerHandlers(instance);
+	const instance = createProductionBot();
 	registerHmrCleanup(instance);
 
 	// In long-running runtimes (local dev) this kicks off polling.
@@ -66,36 +88,57 @@ export function getBot(): Bot {
 	return instance;
 }
 
-function createBot(): Bot {
+function createProductionBot(): Bot {
 	const telegramConfig = getTelegramConfig();
 
-	return new Chat({
-		userName: telegramConfig.botUsername,
-		adapters: {
-			telegram: createTelegramAdapter({
-				botToken: telegramConfig.botToken,
-				// On Vercel this resolves to "webhook"; locally it falls back to polling.
-				mode: "auto",
-				secretToken: telegramConfig.webhookSecretToken,
-				userName: telegramConfig.botUsername,
-			}),
-		},
+	return createBot({
+		agent: getAgent(),
+		debugCommandHandler: maybeHandleMemoryDebugCommand,
+		memoryLoader: loadSessionMemory,
+		memoryUpdater: updateSessionMemory,
 		state: getStateAdapter(),
-		dedupeTtlMs: DEDUPE_TTL_MS,
+		telegramAdapter: createTelegramAdapter({
+			botToken: telegramConfig.botToken,
+			// On Vercel this resolves to "webhook"; locally it falls back to polling.
+			mode: "auto",
+			secretToken: telegramConfig.webhookSecretToken,
+			userName: telegramConfig.botUsername,
+		}),
+		telegramConfig,
 	});
 }
 
-function registerHandlers(bot: Bot): void {
-	bot.onDirectMessage(handleDirectMessage);
+export function createBot(dependencies: CreateBotDependencies): Bot {
+	const bot = new Chat({
+		userName: dependencies.telegramConfig.botUsername,
+		adapters: {
+			telegram: dependencies.telegramAdapter,
+		},
+		state: dependencies.state,
+		dedupeTtlMs: DEDUPE_TTL_MS,
+	});
+
+	registerHandlers(bot, dependencies);
+	return bot;
 }
 
-async function handleDirectMessage(thread: Thread, message: Message): Promise<void> {
+function registerHandlers(bot: Bot, dependencies: DirectMessageDependencies): void {
+	bot.onDirectMessage((thread, message) =>
+		handleDirectMessage(thread, message, dependencies),
+	);
+}
+
+async function handleDirectMessage(
+	thread: Thread,
+	message: Message,
+	dependencies: DirectMessageDependencies,
+): Promise<void> {
 	const text = parseDirectMessageText(message);
 	if (!text) return;
 
 	try {
-		if (await handleMemoryDebugCommand(thread, message, text)) return;
-		await replyWithAgent(thread, message, text);
+		if (await handleMemoryDebugCommand(thread, message, text, dependencies)) return;
+		await replyWithAgent(thread, message, text, dependencies);
 	} catch (err) {
 		console.error("[bot] AI reply failed", err);
 		await thread.post(
@@ -113,8 +156,9 @@ async function handleMemoryDebugCommand(
 	thread: Thread,
 	message: Message,
 	text: string,
+	dependencies: DirectMessageDependencies,
 ): Promise<boolean> {
-	const debugResponse = await maybeHandleMemoryDebugCommand(message, text);
+	const debugResponse = await dependencies.debugCommandHandler(message, text);
 	if (!debugResponse) return false;
 
 	await thread.post(debugResponse);
@@ -125,16 +169,17 @@ async function replyWithAgent(
 	thread: Thread,
 	message: Message,
 	userText: string,
+	dependencies: DirectMessageDependencies,
 ): Promise<void> {
 	await thread.startTyping();
 
-	const memory = await loadSessionMemory(message);
-	const result = await getAgent().stream({
+	const memory = await dependencies.memoryLoader(message);
+	const result = await dependencies.agent.stream({
 		messages: buildMemoryMessages(memory, userText),
 	});
 	const assistantText = await streamAndCollectText(thread, result.textStream);
 
-	await persistConversationTurn({ assistantText, memory, userText });
+	await persistConversationTurn({ assistantText, memory, userText }, dependencies);
 }
 
 async function streamAndCollectText(
@@ -154,19 +199,22 @@ async function streamAndCollectText(
 	return assistantText.trim();
 }
 
-async function persistConversationTurn({
-	assistantText,
-	memory,
-	userText,
-}: {
-	assistantText: string;
-	memory: SessionMemory;
-	userText: string;
-}): Promise<void> {
+async function persistConversationTurn(
+	{
+		assistantText,
+		memory,
+		userText,
+	}: {
+		assistantText: string;
+		memory: SessionMemory;
+		userText: string;
+	},
+	dependencies: DirectMessageDependencies,
+): Promise<void> {
 	if (!assistantText) return;
 
 	try {
-		await updateSessionMemory({
+		await dependencies.memoryUpdater({
 			assistantText,
 			memory,
 			userText,

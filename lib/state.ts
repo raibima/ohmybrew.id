@@ -1,7 +1,11 @@
 import { createRedisState, type RedisStateAdapter } from "@chat-adapter/state-redis";
-import { getStateConfig } from "@/lib/config";
+import { getStateConfig, type StateConfig } from "@/lib/config";
 
 let stateAdapter: RedisStateAdapter | undefined;
+
+export function createStateAdapter(config: StateConfig): RedisStateAdapter {
+	return createRedisState({ url: config.redisUrl });
+}
 
 /**
  * Shared Redis-backed Chat SDK state adapter.
@@ -11,8 +15,7 @@ let stateAdapter: RedisStateAdapter | undefined;
  */
 export function getStateAdapter(): RedisStateAdapter {
 	if (!stateAdapter) {
-		const config = getStateConfig();
-		stateAdapter = createRedisState({ url: config.redisUrl });
+		stateAdapter = createStateAdapter(getStateConfig());
 	}
 
 	return stateAdapter;
